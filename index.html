@@ -1,772 +1,1218 @@
-<!DOCTYPE html>
+<script>
+        // Particle animation system
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.width = '6px';
+            particle.style.height = '6px';
+            particle.style.background = Math.random() > 0.5 ? '#ff6b6b' : '#ff8e53';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '999';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = '-10px';
+            particle.style.opacity = '0.7';
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translateY(0px) rotate(0deg)', opacity: 0.7 },
+                { transform: `translateY(${window.innerHeight + 20}px) rotate(720deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Enhanced navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            const scrolled = window.scrollY > 100;
+            
+            if (scrolled) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+                nav.style.transform = 'translateY(0)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = 'none';
+            }
+        });
+
+        // Interactive form with enhanced feedback
+        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Add shake animation to form
+            this.style.animation = 'shake 0.5s ease-in-out';
+            
+            setTimeout(() => {
+                this.style.animation = '';
+                showNotification('Thank you for your message! We\'ll get back to you soon about Wobble!');
+                this.reset();
+            }, 500);
+        });
+
+        // Enhanced intersection observer with staggered animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) scale(1)';
+                        entry.target.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards with initial styling
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px) scale(0.9)';
+            observer.observe(card);
+        });
+
+        // Logo wobble on click
+        document.querySelector('.logo').addEventListener('click', function() {
+            this.style.animation = 'wobble 1s ease-in-out';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 1000);
+        });
+
+        // Interactive feature cards with sound effect simulation
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-15px) scale(1.02)';
+                
+                // Add slight rotation based on position
+                const rect = this.getBoundingClientRect();
+                const centerX = window.innerWidth / 2;
+                const cardCenterX = rect.left + rect.width / 2;
+                const rotation = (cardCenterX - centerX) / centerX * 2;
+                
+                this.style.transform += ` rotate(${rotation}deg)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+            });
+        });
+
+        // Coming soon notification system
+        function showComingSoon() {
+            showNotification('🚧 Wobble is coming soon! Join our waitlist to be the first to know when we launch!');
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                transform: translateX(400px);
+                transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 500);
+            }, 4000);
+        }
+
+        // Easter egg: Konami code
+        let konamiCode = [];
+        const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+        
+        document.addEventListener('keydown', function(e) {
+            konamiCode.push(e.code);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+                document.body.style.animation = 'wobble 2s ease-in-out';
+                showNotification('🎉 Wobble Easter Egg Activated! Extra wobble mode enabled!');
+                
+                // Add extra wobble to all elements
+                document.querySelectorAll('.feature-card, .about-image, .logo').forEach(el => {
+                    el.classList.add('wobble-animation');
+                });
+                
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                    document.querySelectorAll('.wobble-animation').forEach(el => {
+                        el.classList.remove('wobble-animation');
+                    });
+                }, 2000);
+            }
+        });
+
+        // Mouse trail effect
+        const trail = [];
+        const trailLength = 20;
+        
+        document.addEventListener('mousemove', function(e) {
+            trail.push({x: e.clientX, y: e.clientY});
+            if (trail.length > trailLength) trail.shift();
+            
+            // Create trailing dots occasionally
+            if (Math.random() < 0.1) {
+                const dot = document.createElement('div');
+                dot.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: #ff6b6b;
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 999;
+                    left: ${e.clientX}px;
+                    top: ${e.clientY}px;
+                    animation: fadeOut 1s ease-out forwards;
+                `;
+                
+                document.body.appendChild(dot);
+                setTimeout(() => dot.remove(), 1000);
+            }
+        });
+
+        // Add fadeOut animation for mouse trail
+        const style = document.createElement('style');
+        style.textContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoWobble - Advanced Interactive Experience</title>
+    <title>Wobble - Home </title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background: #fbfbfd;
             overflow-x: hidden;
-            background: #0a0a0a;
-            min-height: 100vh;
-            cursor: none;
         }
 
-        /* Device-specific styles */
-        .desktop-only { display: block; }
-        .mobile-only { display: none; }
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 2.5rem;
+            width: 100%;
+            background: rgba(251, 251, 253, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
 
         @media (max-width: 768px) {
-            .desktop-only { display: none; }
-            .mobile-only { display: block; }
-            body { cursor: auto; }
+            .nav-container {
+                padding: 0 1rem;
+            }
         }
 
-        /* Custom cursor (desktop only) */
-        .cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, #ff6b6b, #ff8e53);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            mix-blend-mode: difference;
-            transition: transform 0.1s ease;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: -0.02em;
         }
 
-        .cursor-trail {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: #ff6b6b;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.7;
+        .logo:hover {
+            color: #007aff;
+            animation: wobble 1s ease-in-out;
         }
 
-        /* Canvas for particles */
-        #particleCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            pointer-events: none;
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
         }
 
-        /* Main container */
-        .container {
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #1d1d1f;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
             position: relative;
-            z-index: 2;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            color: #007aff;
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 50%;
+            background: #007aff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-btn {
+            background: #007aff;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: -0.01em;
+        }
+
+        .cta-btn:hover {
+            background: #0056cc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.25);
+        }
+
+        @media (max-width: 480px) {
+            .cta-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 80px 20px 40px;
+            background: #fbfbfd;
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem;
         }
 
-        .hero-section {
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(0,122,255,0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(88,86,214,0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(175,82,222,0.05) 0%, transparent 50%);
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                min-height: 90vh;
+                padding: 0 1rem;
+            }
+        }
+
+        .hero-content {
             text-align: center;
             max-width: 800px;
-            width: 100%;
-        }
-
-        .logo-container {
+            padding: 0 2rem;
+            z-index: 2;
             position: relative;
-            margin-bottom: 20px;
         }
 
-        .logo {
-            font-size: 80px;
-            font-weight: 900;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
-            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
-            transition: filter 0.3s ease;
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 0 1rem;
+                max-width: 600px;
+            }
         }
 
-        .logo:hover {
-            filter: hue-rotate(45deg);
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .tagline {
-            font-size: 24px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 30px;
-            font-weight: 300;
-        }
-
-        /* Interactive food elements (desktop only) */
-        .food-orbit {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        .food-item {
-            position: absolute;
-            font-size: 40px;
-            animation: orbit 20s linear infinite;
-            cursor: pointer;
-            pointer-events: auto;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-        }
-
-        .food-item:hover {
-            transform: scale(1.3);
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-            animation-play-state: paused;
-        }
-
-        .food-item:nth-child(1) { animation-delay: 0s; }
-        .food-item:nth-child(2) { animation-delay: -2.5s; }
-        .food-item:nth-child(3) { animation-delay: -5s; }
-        .food-item:nth-child(4) { animation-delay: -7.5s; }
-        .food-item:nth-child(5) { animation-delay: -10s; }
-        .food-item:nth-child(6) { animation-delay: -12.5s; }
-        .food-item:nth-child(7) { animation-delay: -15s; }
-        .food-item:nth-child(8) { animation-delay: -17.5s; }
-
-        @keyframes orbit {
-            from { transform: rotate(0deg) translateX(300px) rotate(0deg); }
-            to { transform: rotate(360deg) translateX(300px) rotate(-360deg); }
-        }
-
-        /* Status badge with morphing effect (only this moves) */
-        .status-badge {
-            display: inline-block;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            background-size: 200% 200%;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            animation: morphBadge 4s ease-in-out infinite, gradientShift 3s ease-in-out infinite;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        @keyframes morphBadge {
-            0%, 100% { border-radius: 50px; transform: scale(1); }
-            25% { border-radius: 20px; transform: scale(1.02); }
-            50% { border-radius: 30px; transform: scale(1.05); }
-            75% { border-radius: 40px; transform: scale(1.02); }
-        }
-
-        .description {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Waitlist section */
-        .waitlist-section {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            padding: 40px;
-            margin: 40px 0;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .waitlist-title {
-            color: white;
-            font-size: 24px;
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
+            color: #1d1d1f;
+            animation: fadeInUp 1s ease;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
         }
 
-        .waitlist-desc {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            margin-bottom: 25px;
+        .hero p {
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            color: #86868b;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 1s ease 0.2s both;
+            line-height: 1.5;
         }
 
-        .waitlist-form {
+        .hero-buttons {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
         }
 
-        .email-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
+        @media (max-width: 480px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.75rem;
+            }
+        }
+
+        .btn-primary {
+            background: #007aff;
             color: white;
-            font-size: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .email-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .email-input:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
-        }
-
-        .join-btn {
-            padding: 15px 25px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 1rem 2rem;
             border: none;
-            border-radius: 15px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 120px;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: -0.01em;
+            min-width: 140px;
         }
 
-        .join-btn:hover {
+        .btn-secondary {
+            background: transparent;
+            color: #1d1d1f;
+            padding: 1rem 2rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: -0.01em;
+            min-width: 140px;
+        }
+
+        .btn-primary:hover {
+            background: #0056cc;
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.25);
         }
 
-        .join-btn:active {
-            transform: translateY(0);
+        .btn-secondary:hover {
+            background: #1d1d1f;
+            color: #fbfbfd;
+            border-color: #1d1d1f;
+            transform: translateY(-2px);
         }
 
-        .waitlist-count {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            text-align: center;
+        @media (max-width: 480px) {
+            .btn-primary, .btn-secondary {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+                max-width: 280px;
+            }
         }
 
-        /* Contact section */
-        .contact-section {
-            margin-top: 50px;
+        /* Features Section */
+        .features {
+            padding: 8rem 2rem;
+            background: #f5f5f7;
         }
 
-        .contact-title {
-            color: white;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 25px;
+        @media (max-width: 768px) {
+            .features {
+                padding: 4rem 1rem;
+            }
         }
 
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            max-width: 600px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .contact-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px;
+        .section-title {
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 4rem;
+            color: #1d1d1f;
+            letter-spacing: -0.025em;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                margin-bottom: 3rem;
+            }
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .feature-card {
+            background: #ffffff;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
             cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #007aff, #5856d6, #af52de);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-card:nth-child(odd):hover {
+            transform: translateY(-8px) scale(1.02) rotate(0.5deg);
+        }
+
+        .feature-card:nth-child(even):hover {
+            transform: translateY(-8px) scale(1.02) rotate(-0.5deg);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .contact-card::before {
+        .feature-icon::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
         }
 
-        .contact-card:hover::before {
-            left: 100%;
-        }
-
-        .contact-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.2);
-            border-color: rgba(255, 107, 107, 0.3);
-        }
-
-        .contact-icon {
-            width: 30px;
-            height: 30px;
-            margin: 0 auto 15px;
-            fill: #ff6b6b;
-            transition: all 0.3s ease;
-        }
-
-        .contact-card:hover .contact-icon {
-            fill: #4ecdc4;
+        .feature-card:hover .feature-icon {
             transform: scale(1.1);
         }
 
-        .contact-text {
-            color: white;
-            font-size: 16px;
+        .feature-card:hover .feature-icon::before {
+            left: 100%;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+            letter-spacing: -0.01em;
         }
 
-        .contact-desc {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+        .feature-card p {
+            color: #86868b;
+            line-height: 1.6;
+            font-size: 1rem;
         }
 
-        /* Sound wave animation (desktop only) */
-        .sound-wave {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
+        /* About Section */
+        .about {
+            padding: 8rem 2rem;
+            background: #fbfbfd;
+        }
+
+        @media (max-width: 768px) {
+            .about {
+                padding: 4rem 1rem;
+            }
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
             align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            z-index: 100;
         }
 
-        .wave-bar {
-            width: 4px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            border-radius: 2px;
-            animation: wave 1.5s ease-in-out infinite;
+        @media (max-width: 968px) {
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                text-align: center;
+            }
         }
 
-        .wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
-        .wave-bar:nth-child(2) { height: 30px; animation-delay: 0.1s; }
-        .wave-bar:nth-child(3) { height: 25px; animation-delay: 0.2s; }
-        .wave-bar:nth-child(4) { height: 35px; animation-delay: 0.3s; }
-        .wave-bar:nth-child(5) { height: 28px; animation-delay: 0.4s; }
-
-        @keyframes wave {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.3); }
+        .about-text h2 {
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1d1d1f;
+            letter-spacing: -0.025em;
         }
 
-        /* Loading screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
-            z-index: 10000;
+        .about-text p {
+            font-size: 1.1rem;
+            color: #86868b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .about-image {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 20px;
+            height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            animation: fadeOutLoading 2s ease-in-out 3s forwards;
-        }
-
-        .loading-logo {
-            font-size: 60px;
-            font-weight: 900;
-            color: #ff6b6b;
-            margin-bottom: 30px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .loading-progress {
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+            font-size: 4rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
         }
 
-        .progress-bar {
-            width: 0%;
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .about-image:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .about-image:hover {
+            transform: scale(1.05);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 8rem 2rem;
+            background: #fff;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .contact-info p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+        }
+
+        .contact-form {
+            background: #f8f9fa;
+            padding: 3rem;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            animation: loadProgress 3s ease-in-out forwards;
+            background: linear-gradient(90deg, transparent, rgba(255,107,107,0.05), transparent);
+            transition: left 0.8s ease;
         }
 
-        @keyframes loadProgress {
-            to { width: 100%; }
+        .contact-form:hover::before {
+            left: 100%;
         }
 
-        @keyframes fadeOutLoading {
-            to {
-                opacity: 0;
-                pointer-events: none;
-            }
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.2);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 3rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ff6b6b;
+        }
+
+        /* Development Banner */
+        .dev-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(45deg, #007aff, #5856d6, #af52de, #ff2d92);
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 1001;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            animation: none;
+            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.5);
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        /* Success message */
-        .success-message {
-            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 15px;
-            font-weight: 600;
-            margin-top: 15px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
+        /* Enhanced Animations */
+        @keyframes wobble {
+            0% { transform: translateX(0px); }
+            15% { transform: translateX(-25px) rotate(-5deg); }
+            30% { transform: translateX(20px) rotate(3deg); }
+            45% { transform: translateX(-15px) rotate(-3deg); }
+            60% { transform: translateX(10px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-1deg); }
+            100% { transform: translateX(0px); }
         }
 
-        .success-message.show {
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
 
-        /* Mobile specific styles */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .wobble-animation {
+            animation: wobble 2s ease-in-out infinite;
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 60px 20px 20px;
+            .nav-links {
+                display: none;
             }
-
-            .logo {
-                font-size: 50px;
+            
+            .hero h1 {
+                font-size: 2.5rem;
             }
-
-            .tagline {
-                font-size: 18px;
+            
+            .hero p {
+                font-size: 1.1rem;
             }
-
-            .description {
-                font-size: 16px;
-            }
-
-            .waitlist-section {
-                padding: 30px 25px;
-            }
-
-            .waitlist-form {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .join-btn {
-                width: 100%;
-            }
-
-            .contact-grid {
+            
+            .about-content,
+            .contact-content {
                 grid-template-columns: 1fr;
-                max-width: 300px;
             }
-
-            .food-orbit {
-                width: 400px;
-                height: 400px;
-            }
-
-            .food-item {
-                font-size: 30px;
-            }
-
-            @keyframes orbit {
-                from { transform: rotate(0deg) translateX(200px) rotate(0deg); }
-                to { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo {
-                font-size: 40px;
-            }
-
-            .waitlist-section {
-                padding: 25px 20px;
-            }
-
-            .food-orbit {
-                width: 300px;
-                height: 300px;
-            }
-
-            .food-item {
-                font-size: 25px;
-            }
-
-            @keyframes orbit {
-                from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-                to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
-            }
-        }
-
-        /* Tablet styles */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .logo {
-                font-size: 65px;
-            }
-
-            .food-orbit {
-                width: 500px;
-                height: 500px;
-            }
-
-            @keyframes orbit {
-                from { transform: rotate(0deg) translateX(250px) rotate(0deg); }
-                to { transform: rotate(360deg) translateX(250px) rotate(-360deg); }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading screen -->
-    <div class="loading-screen">
-        <div class="loading-logo">GoWobble</div>
-        <div class="loading-progress">
-            <div class="progress-bar"></div>
-        </div>
+    <!-- Development Banner -->
+    <div class="dev-banner">
+        🚧 Wobble is currently in development - Coming Soon! 🚧
     </div>
 
-    <!-- Custom cursor (desktop only) -->
-    <div class="cursor desktop-only"></div>
-
-    <!-- Particle canvas -->
-    <canvas id="particleCanvas"></canvas>
-
-    <!-- Sound wave visualizer (desktop only) -->
-    <div class="sound-wave desktop-only" onclick="toggleSound()">
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-    </div>
-
-    <div class="container">
-        <!-- Orbiting food items (desktop only) -->
-        <div class="food-orbit desktop-only">
-            <div class="food-item" onclick="foodClick(this)">🍕</div>
-            <div class="food-item" onclick="foodClick(this)">🍔</div>
-            <div class="food-item" onclick="foodClick(this)">🍜</div>
-            <div class="food-item" onclick="foodClick(this)">🥗</div>
-            <div class="food-item" onclick="foodClick(this)">🍰</div>
-            <div class="food-item" onclick="foodClick(this)">🍣</div>
-            <div class="food-item" onclick="foodClick(this)">🌮</div>
-            <div class="food-item" onclick="foodClick(this)">🍝</div>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🍽️ Wobble</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#download" class="cta-btn">Download App</a>
         </div>
+    </nav>
 
-        <div class="hero-section">
-            <div class="logo-container">
-                <h1 class="logo">GoWobble</h1>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Discover Amazing Food with Wobble</h1>
+            <p>Your ultimate culinary companion is coming soon! Get ready to explore restaurants, discover recipes, and connect with fellow food lovers in one beautiful app.</p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn-primary">Join Waitlist</a>
+                <a href="#features" class="btn-secondary">Learn More</a>
             </div>
-            
-            <p class="tagline">Revolutionary Food Experience Awaits</p>
-            
-            <div class="status-badge">Coming Soon</div>
-            
-            <p class="description">
-                We're cooking up something amazing! GoWobble is a revolutionary food app that will transform how you discover, order, and enjoy your favorite meals.
-            </p>
+        </div>
+    </section>
 
-            <!-- Waitlist Section -->
-            <div class="waitlist-section">
-                <h3 class="waitlist-title">Join the Waitlist</h3>
-                <p class="waitlist-desc">Be the first to know when we launch and get exclusive early access!</p>
-                
-                <form class="waitlist-form" id="waitlistForm">
-                    <input 
-                        type="email" 
-                        class="email-input" 
-                        placeholder="Enter your email address"
-                        required
-                        id="emailInput"
-                    >
-                    <button type="submit" class="join-btn">Join Now</button>
-                </form>
-                
-                <div class="waitlist-count">
-                    <span id="waitlistCounter">2,847</span> people already joined!
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Amazing Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Discovery</h3>
+                    <p>Find restaurants and dishes based on your preferences, dietary restrictions, and location. Our AI-powered recommendation engine learns from your tastes.</p>
                 </div>
-
-                <div class="success-message" id="successMessage">
-                    🎉 You're on the list! We'll notify you when GoWobble launches.
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Easy Ordering</h3>
+                    <p>Order from your favorite restaurants with just a few taps. Track your delivery in real-time and enjoy contactless dining experiences.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Community</h3>
+                    <p>Connect with food enthusiasts, share reviews, photos, and discover hidden gems recommended by locals and fellow foodies.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Rewards</h3>
+                    <p>Earn points with every order and review. Unlock exclusive discounts, free meals, and VIP access to new restaurant launches.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Nutrition Tracking</h3>
+                    <p>Keep track of your nutritional intake with detailed food analysis. Set dietary goals and monitor your healthy eating journey.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast & Reliable</h3>
+                    <p>Lightning-fast app performance with offline functionality. Access your favorite restaurants and order history even without internet.</p>
                 </div>
             </div>
-            
-            <div class="contact-section">
-                <h3 class="contact-title">Get in Touch</h3>
-                <div class="contact-grid">
-                    <div class="contact-card" onclick="contactClick('email')">
-                        <svg class="contact-icon" viewBox="0 0 24 24">
-                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                        </svg>
-                        <div class="contact-text">Email</div>
-                        <div class="contact-desc">hello@gowobble.com</div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Wobble</h2>
+                    <p>We're passionate about connecting people with great food experiences. Founded by food lovers, for food lovers, Wobble is more than just another food delivery app.</p>
+                    <p>Our mission is to create a vibrant community where culinary discovery meets convenience. Whether you're looking for your next favorite restaurant, wanting to try a new cuisine, or simply craving comfort food, we're here to make it happen.</p>
+                    <p>Currently in development, Wobble will feature AI-powered recommendations, seamless ordering, and a thriving community of food enthusiasts. Stay tuned for our launch!</p>
+                </div>
+                <div class="about-image">
+                    🍕
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <p>Have questions, feedback, or want to partner with us? We'd love to hear from you!</p>
+                    
+                    <div class="contact-item">
+                        <div class="contact-item-icon">📧</div>
+                        <div>
+                            <strong>Email</strong><br>
+                            hello@wobbleapp.com
+                        </div>
                     </div>
                     
-                    <div class="contact-card" onclick="contactClick('twitter')">
-                        <svg class="contact-icon" viewBox="0 0 24 24">
-                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                        </svg>
-                        <div class="contact-text">Twitter</div>
-                        <div class="contact-desc">@gowobble</div>
+                    <div class="contact-item">
+                        <div class="contact-item-icon">📞</div>
+                        <div>
+                            <strong>Phone</strong><br>
+                            +1 (555) 123-4567
+                        </div>
                     </div>
                     
-                    <div class="contact-card" onclick="contactClick('instagram')">
-                        <svg class="contact-icon" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
-                        <div class="contact-text">Instagram</div>
-                        <div class="contact-desc">@gowobble</div>
+                    <div class="contact-item">
+                        <div class="contact-item-icon">📍</div>
+                        <div>
+                            <strong>Address</strong><br>
+                            123 Food Street, Culinary City, FC 12345
+                        </div>
                     </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Send Message</button>
+                    </form>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Floating Action Button -->
+    <div class="fab" onclick="showComingSoon()">
+        🔔
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#support">Support</a>
+                <a href="#careers">Careers</a>
+                <a href="#press">Press</a>
+            </div>
+            <p>&copy; 2024 Wobble. All rights reserved. Made with ❤️ for food lovers everywhere.</p>
+        </div>
+    </footer>
 
     <script>
-        // Device detection
-        const isMobile = window.innerWidth <= 768;
-        let waitlistCount = 2847;
-
-        // Particle system (simplified for mobile)
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let mouse = { x: 0, y: 0 };
-        let soundEnabled = true;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * (isMobile ? 1 : 2);
-                this.vy = (Math.random() - 0.5) * (isMobile ? 1 : 2);
-                this.life = Math.random() * 100 + 100;
-                this.maxLife = this.life;
-                this.color = `hsl(${Math.random() * 60 + 15}, 70%, 60%)`;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life--;
-
-                // Simplified attraction for mobile
-                if (!isMobile) {
-                    const dx = mouse.x - this.x;
-                    const dy = mouse.y - this.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 100) {
-                        this.vx += dx * 0.0001;
-                        this.vy += dy * 0.0001;
-                    }
-                }
-
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                this.x = Math.max(0, Math.min(canvas.width, this.x));
-                this.y = Math.max(0, Math.min(canvas.height, this.y));
-            }
-
-            draw() {
-                const alpha = this.life / this.maxLife;
-                ctx.save();
-                ctx.globalAlpha = alpha * 0.3;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, isMobile ? 1 : 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const particleCount = isMobile ? 25 : 50;
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function animate() {
-            ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach((particle, index) => {
-                particle.update();
-                particle.draw();
-
-                if (particle.life <= 0) {
-                    particles[index] = new Particle();
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
+        });
 
-            // Simplified connections for desktop only
-            if (!isMobile) {
-                particles.forEach((p1, i) => {
-                    particles.slice(i + 1).forEach(p2 => {
-                        const dx = p1.x - p2.x;
-                        const dy = p1.y - p2.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < 80) {
-                            ctx.save();
-                            ctx.globalAlpha = 0.1 * (1 - dist / 80);
-                            ctx.strokeStyle = '#ff6b6b';
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                            ctx.restore();
-                        }
-                    });
-                });
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = 'none';
             }
+        });
 
-            requestAnimationFrame(animate);
-        }
+        // Form submission
+        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you soon.');
+            this.reset();
+        });
 
-        initParticles();
-        animate();
+        // Feature cards hover animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        // Mouse tracking (desktop only)
-        if (!isMobile) {
-            
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = Math.random() * 0.5 + 's';
+                    entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
