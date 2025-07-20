@@ -1,233 +1,9 @@
-<script>
-        // Particle animation system
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.style.position = 'fixed';
-            particle.style.width = '6px';
-            particle.style.height = '6px';
-            particle.style.background = Math.random() > 0.5 ? '#ff6b6b' : '#ff8e53';
-            particle.style.borderRadius = '50%';
-            particle.style.pointerEvents = 'none';
-            particle.style.zIndex = '999';
-            particle.style.left = Math.random() * window.innerWidth + 'px';
-            particle.style.top = '-10px';
-            particle.style.opacity = '0.7';
-            
-            document.body.appendChild(particle);
-            
-            const animation = particle.animate([
-                { transform: 'translateY(0px) rotate(0deg)', opacity: 0.7 },
-                { transform: `translateY(${window.innerHeight + 20}px) rotate(720deg)`, opacity: 0 }
-            ], {
-                duration: Math.random() * 3000 + 2000,
-                easing: 'linear'
-            });
-            
-            animation.onfinish = () => particle.remove();
-        }
-
-        // Create particles periodically
-        setInterval(createParticle, 2000);
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Enhanced navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const nav = document.querySelector('nav');
-            const scrolled = window.scrollY > 100;
-            
-            if (scrolled) {
-                nav.style.background = 'rgba(255, 255, 255, 0.98)';
-                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
-                nav.style.transform = 'translateY(0)';
-            } else {
-                nav.style.background = 'rgba(255, 255, 255, 0.95)';
-                nav.style.boxShadow = 'none';
-            }
-        });
-
-        // Interactive form with enhanced feedback
-        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Add shake animation to form
-            this.style.animation = 'shake 0.5s ease-in-out';
-            
-            setTimeout(() => {
-                this.style.animation = '';
-                showNotification('Thank you for your message! We\'ll get back to you soon about Wobble!');
-                this.reset();
-            }, 500);
-        });
-
-        // Enhanced intersection observer with staggered animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0) scale(1)';
-                        entry.target.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    }, index * 100);
-                }
-            });
-        }, observerOptions);
-
-        // Observe feature cards with initial styling
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px) scale(0.9)';
-            observer.observe(card);
-        });
-
-        // Logo wobble on click
-        document.querySelector('.logo').addEventListener('click', function() {
-            this.style.animation = 'wobble 1s ease-in-out';
-            setTimeout(() => {
-                this.style.animation = '';
-            }, 1000);
-        });
-
-        // Interactive feature cards with sound effect simulation
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-15px) scale(1.02)';
-                
-                // Add slight rotation based on position
-                const rect = this.getBoundingClientRect();
-                const centerX = window.innerWidth / 2;
-                const cardCenterX = rect.left + rect.width / 2;
-                const rotation = (cardCenterX - centerX) / centerX * 2;
-                
-                this.style.transform += ` rotate(${rotation}deg)`;
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1) rotate(0deg)';
-            });
-        });
-
-        // Coming soon notification system
-        function showComingSoon() {
-            showNotification('🚧 Wobble is coming soon! Join our waitlist to be the first to know when we launch!');
-        }
-
-        function showNotification(message) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-                color: white;
-                padding: 1rem 2rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
-                z-index: 10000;
-                font-weight: 600;
-                transform: translateX(400px);
-                transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                max-width: 300px;
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            // Slide in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Auto remove after 4 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(400px)';
-                setTimeout(() => notification.remove(), 500);
-            }, 4000);
-        }
-
-        // Easter egg: Konami code
-        let konamiCode = [];
-        const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-        
-        document.addEventListener('keydown', function(e) {
-            konamiCode.push(e.code);
-            if (konamiCode.length > konamiSequence.length) {
-                konamiCode.shift();
-            }
-            
-            if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
-                document.body.style.animation = 'wobble 2s ease-in-out';
-                showNotification('🎉 Wobble Easter Egg Activated! Extra wobble mode enabled!');
-                
-                // Add extra wobble to all elements
-                document.querySelectorAll('.feature-card, .about-image, .logo').forEach(el => {
-                    el.classList.add('wobble-animation');
-                });
-                
-                setTimeout(() => {
-                    document.body.style.animation = '';
-                    document.querySelectorAll('.wobble-animation').forEach(el => {
-                        el.classList.remove('wobble-animation');
-                    });
-                }, 2000);
-            }
-        });
-
-        // Mouse trail effect
-        const trail = [];
-        const trailLength = 20;
-        
-        document.addEventListener('mousemove', function(e) {
-            trail.push({x: e.clientX, y: e.clientY});
-            if (trail.length > trailLength) trail.shift();
-            
-            // Create trailing dots occasionally
-            if (Math.random() < 0.1) {
-                const dot = document.createElement('div');
-                dot.style.cssText = `
-                    position: fixed;
-                    width: 4px;
-                    height: 4px;
-                    background: #ff6b6b;
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 999;
-                    left: ${e.clientX}px;
-                    top: ${e.clientY}px;
-                    animation: fadeOut 1s ease-out forwards;
-                `;
-                
-                document.body.appendChild(dot);
-                setTimeout(() => dot.remove(), 1000);
-            }
-        });
-
-        // Add fadeOut animation for mouse trail
-        const style = document.createElement('style');
-        style.textContent = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wobble - Home </title>
+    <title>Wobble | Order</title>
     <style>
         * {
             margin: 0;
@@ -236,126 +12,145 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #1d1d1f;
-            background: #fbfbfd;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .wobble-loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Floating Background Elements */
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-element:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-element:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: -2s;
+        }
+
+        .bg-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
 
         /* Navigation */
         nav {
             position: fixed;
-            top: 2.5rem;
+            top: 0;
             width: 100%;
-            background: rgba(251, 251, 253, 0.8);
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             z-index: 1000;
-            padding: 1rem 0;
             transition: all 0.3s ease;
-            border-bottom: 0.5px solid rgba(0,0,0,0.1);
         }
 
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .nav-container {
-                padding: 0 1rem;
-            }
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1d1d1f;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: -0.02em;
-        }
-
-        .logo:hover {
-            color: #007aff;
-            animation: wobble 1s ease-in-out;
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            animation: slideInLeft 0.8s ease-out;
         }
 
         .nav-links {
             display: flex;
+            gap: 30px;
             list-style: none;
-            gap: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
         }
 
         .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            color: #1d1d1f;
-            font-weight: 400;
-            font-size: 0.95rem;
+            font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
-            opacity: 0.8;
         }
 
         .nav-links a:hover {
-            color: #007aff;
-            opacity: 1;
-            transform: translateY(-1px);
+            color: #fff;
+            transform: translateY(-2px);
         }
 
         .nav-links a::after {
             content: '';
             position: absolute;
-            width: 0;
-            height: 1px;
             bottom: -5px;
-            left: 50%;
-            background: #007aff;
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #fff;
+            transition: width 0.3s ease;
         }
 
         .nav-links a:hover::after {
             width: 100%;
-        }
-
-        .cta-btn {
-            background: #007aff;
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: -0.01em;
-        }
-
-        .cta-btn:hover {
-            background: #0056cc;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.25);
-        }
-
-        @media (max-width: 480px) {
-            .cta-btn {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
-            }
         }
 
         /* Hero Section */
@@ -364,145 +159,82 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fbfbfd;
+            text-align: center;
             position: relative;
-            overflow: hidden;
-            padding: 0 2rem;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 40%, rgba(0,122,255,0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(88,86,214,0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(175,82,222,0.05) 0%, transparent 50%);
-            opacity: 0.6;
-        }
-
-        @media (max-width: 768px) {
-            .hero {
-                min-height: 90vh;
-                padding: 0 1rem;
-            }
+            padding: 120px 20px 80px;
         }
 
         .hero-content {
-            text-align: center;
             max-width: 800px;
-            padding: 0 2rem;
-            z-index: 2;
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .hero-content {
-                padding: 0 1rem;
-                max-width: 600px;
-            }
+            animation: slideInUp 1s ease-out 0.3s both;
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #1d1d1f;
-            animation: fadeInUp 1s ease;
-            letter-spacing: -0.025em;
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1.1;
         }
 
         .hero p {
-            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-            color: #86868b;
-            margin-bottom: 2.5rem;
-            animation: fadeInUp 1s ease 0.2s both;
-            line-height: 1.5;
+            font-size: clamp(18px, 3vw, 24px);
+            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
         }
 
-        .hero-buttons {
+        .cta-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
-            animation: fadeInUp 1s ease 0.4s both;
+            margin-bottom: 60px;
         }
 
-        @media (max-width: 480px) {
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-                gap: 0.75rem;
-            }
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
-            background: #007aff;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
             color: white;
-            padding: 1rem 2rem;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: -0.01em;
-            min-width: 140px;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #1d1d1f;
-            padding: 1rem 2rem;
-            border: 1px solid #d2d2d7;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: -0.01em;
-            min-width: 140px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
         }
 
         .btn-primary:hover {
-            background: #0056cc;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            background: #1d1d1f;
-            color: #fbfbfd;
-            border-color: #1d1d1f;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 480px) {
-            .btn-primary, .btn-secondary {
-                padding: 0.875rem 1.5rem;
-                font-size: 1rem;
-                width: 100%;
-                max-width: 280px;
-            }
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
         }
 
         /* Features Section */
         .features {
-            padding: 8rem 2rem;
-            background: #f5f5f7;
-        }
-
-        @media (max-width: 768px) {
-            .features {
-                padding: 4rem 1rem;
-            }
+            padding: 100px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .container {
@@ -512,388 +244,45 @@
 
         .section-title {
             text-align: center;
-            font-size: clamp(2.5rem, 5vw, 3rem);
+            font-size: clamp(36px, 6vw, 48px);
             font-weight: 700;
-            margin-bottom: 4rem;
-            color: #1d1d1f;
-            letter-spacing: -0.025em;
-        }
-
-        @media (max-width: 768px) {
-            .section-title {
-                margin-bottom: 3rem;
-            }
+            margin-bottom: 60px;
+            color: #fff;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
+            gap: 40px;
         }
 
         .feature-card {
-            background: #ffffff;
-            padding: 3rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        @media (max-width: 768px) {
-            .feature-card {
-                padding: 2rem 1.5rem;
-            }
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #007aff, #5856d6, #af52de);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover::before {
-            transform: scaleX(1);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .feature-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-
-        .feature-card:nth-child(odd):hover {
-            transform: translateY(-8px) scale(1.02) rotate(0.5deg);
-        }
-
-        .feature-card:nth-child(even):hover {
-            transform: translateY(-8px) scale(1.02) rotate(-0.5deg);
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #007aff, #5856d6);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1);
-        }
-
-        .feature-card:hover .feature-icon::before {
-            left: 100%;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1d1d1f;
-            letter-spacing: -0.01em;
-        }
-
-        .feature-card p {
-            color: #86868b;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        /* About Section */
-        .about {
-            padding: 8rem 2rem;
-            background: #fbfbfd;
-        }
-
-        @media (max-width: 768px) {
-            .about {
-                padding: 4rem 1rem;
-            }
-        }
-
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        @media (max-width: 968px) {
-            .about-content {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-                text-align: center;
-            }
-        }
-
-        .about-text h2 {
-            font-size: clamp(2.5rem, 5vw, 3rem);
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: #1d1d1f;
-            letter-spacing: -0.025em;
-        }
-
-        .about-text p {
-            font-size: 1.1rem;
-            color: #86868b;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .about-image {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-            border-radius: 20px;
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .about-image::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
-        }
-
-        .about-image:hover::before {
-            width: 200%;
-            height: 200%;
-        }
-
-        .about-image:hover {
-            transform: scale(1.05);
-            animation: float 2s ease-in-out infinite;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 8rem 2rem;
-            background: #fff;
-        }
-
-        .contact-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-        }
-
-        .contact-info h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-
-        .contact-info p {
-            color: #666;
-            margin-bottom: 2rem;
-            line-height: 1.8;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .contact-item-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
-            color: white;
-        }
-
-        .contact-form {
-            background: #f8f9fa;
-            padding: 3rem;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .contact-form::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,107,107,0.05), transparent);
-            transition: left 0.8s ease;
-        }
-
-        .contact-form:hover::before {
-            left: 100%;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.2);
-        }
-
-        .form-group textarea {
-            height: 120px;
-            resize: vertical;
-        }
-
-        /* Footer */
-        .footer {
-            background: #333;
-            color: white;
-            padding: 3rem 2rem 2rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: #ff6b6b;
-        }
-
-        /* Development Banner */
-        .dev-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(45deg, #007aff, #5856d6, #af52de, #ff2d92);
-            background-size: 300% 300%;
-            animation: gradientShift 3s ease infinite;
-            color: white;
-            text-align: center;
-            padding: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 1001;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Floating Action Button */
-        .fab {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            font-size: 40px;
             animation: pulse 2s infinite;
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-            animation: none;
-            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.5);
         }
 
         @keyframes pulse {
@@ -902,267 +291,412 @@
             100% { transform: scale(1); }
         }
 
-        /* Enhanced Animations */
-        @keyframes wobble {
-            0% { transform: translateX(0px); }
-            15% { transform: translateX(-25px) rotate(-5deg); }
-            30% { transform: translateX(20px) rotate(3deg); }
-            45% { transform: translateX(-15px) rotate(-3deg); }
-            60% { transform: translateX(10px) rotate(2deg); }
-            75% { transform: translateX(-5px) rotate(-1deg); }
-            100% { transform: translateX(0px); }
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
         }
 
+        /* Stats Section */
+        .stats {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            animation: countUp 2s ease-out;
+        }
+
+        .stat-number {
+            font-size: clamp(36px, 6vw, 48px);
+            font-weight: 800;
+            color: #ffa500;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            padding: 100px 20px;
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 165, 0, 0.1));
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .newsletter h2 {
+            font-size: clamp(32px, 5vw, 42px);
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .newsletter p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .signup-form {
+            display: flex;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .signup-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .signup-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .signup-form input:focus {
+            border-color: #ffa500;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .signup-form button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .signup-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: #ffa500;
+            transform: translateY(-3px);
+        }
+
+        /* Animations */
         @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.1);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-
-        .wobble-animation {
-            animation: wobble 2s ease-in-out infinite;
-        }
-
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        /* Responsive */
+        /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
             }
-            
-            .hero h1 {
-                font-size: 2.5rem;
+
+            .hero {
+                padding: 100px 20px 60px;
             }
-            
-            .hero p {
-                font-size: 1.1rem;
-            }
-            
-            .about-content,
-            .contact-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .hero-buttons {
+
+            .cta-buttons {
                 flex-direction: column;
                 align-items: center;
             }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .signup-form {
+                flex-direction: column;
+            }
+
+            .signup-form input,
+            .signup-form button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .success-message.show {
+            transform: translateX(0);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            z-index: 9999;
+            transition: width 0.1s ease;
         }
     </style>
 </head>
 <body>
-    <!-- Development Banner -->
-    <div class="dev-banner">
-        🚧 Wobble is currently in development - Coming Soon! 🚧
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="wobble-loader"></div>
     </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <!-- Background Elements -->
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
 
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="logo">🍽️ Wobble</div>
+            <a href="#" class="logo">Wobble</a>
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#signup">Get Notified</a></li>
             </ul>
-            <a href="#download" class="cta-btn">Download App</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero">
+    <section class="hero">
         <div class="hero-content">
-            <h1>Discover Amazing Food with Wobble</h1>
-            <p>Your ultimate culinary companion is coming soon! Get ready to explore restaurants, discover recipes, and connect with fellow food lovers in one beautiful app.</p>
-            <div class="hero-buttons">
-                <a href="#download" class="btn-primary">Join Waitlist</a>
-                <a href="#features" class="btn-secondary">Learn More</a>
+            <h1>Food Delivery<br></h1>
+            <p>Experience the future of food delivery with Wobble. Connecting food vendors, customers, and delivery agents in Zambia like never before.</p>
+            <div class="cta-buttons">
+                <a href="#signup" class="btn btn-primary">Get Early Access</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="features">
+    <section class="features" id="features">
         <div class="container">
-            <h2 class="section-title">Amazing Features</h2>
+            <h2 class="section-title">Why Choose Wobble?</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>Smart Discovery</h3>
-                    <p>Find restaurants and dishes based on your preferences, dietary restrictions, and location. Our AI-powered recommendation engine learns from your tastes.</p>
+                    <div class="feature-icon">🚀</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Advanced matching algorithm connects you with the nearest vendors and fastest delivery agents in real-time.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>Easy Ordering</h3>
-                    <p>Order from your favorite restaurants with just a few taps. Track your delivery in real-time and enjoy contactless dining experiences.</p>
+                    <div class="feature-icon">💎</div>
+                    <h3>Premium Quality</h3>
+                    <p>Curated selection of top-rated food vendors ensuring every meal meets our high standards of quality and taste.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">👥</div>
-                    <h3>Community</h3>
-                    <p>Connect with food enthusiasts, share reviews, photos, and discover hidden gems recommended by locals and fellow foodies.</p>
+                    <div class="feature-icon">🎯</div>
+                    <h3>Smart Tracking</h3>
+                    <p>Real-time GPS tracking and AI-powered delivery optimization for the most efficient food delivery experience.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Rewards</h3>
-                    <p>Earn points with every order and review. Unlock exclusive discounts, free meals, and VIP access to new restaurant launches.</p>
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Secure & Reliable</h3>
+                    <p>End-to-end encryption, secure payments, and verified delivery agents ensure your safety and peace of mind.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Nutrition Tracking</h3>
-                    <p>Keep track of your nutritional intake with detailed food analysis. Set dietary goals and monitor your healthy eating journey.</p>
+                    <div class="feature-icon">🌟</div>
+                    <h3>Local First</h3>
+                    <p>Built specifically for Zambia, supporting local businesses and understanding unique cultural preferences.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Fast & Reliable</h3>
-                    <p>Lightning-fast app performance with offline functionality. Access your favorite restaurants and order history even without internet.</p>
+                    <div class="feature-icon">💰</div>
+                    <h3>Fair Pricing</h3>
+                    <p>Transparent pricing with no hidden fees. Great value for customers, fair earnings for vendors and agents.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <!-- Stats Section -->
+    <section class="stats">
         <div class="container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>About Wobble</h2>
-                    <p>We're passionate about connecting people with great food experiences. Founded by food lovers, for food lovers, Wobble is more than just another food delivery app.</p>
-                    <p>Our mission is to create a vibrant community where culinary discovery meets convenience. Whether you're looking for your next favorite restaurant, wanting to try a new cuisine, or simply craving comfort food, we're here to make it happen.</p>
-                    <p>Currently in development, Wobble will feature AI-powered recommendations, seamless ordering, and a thriving community of food enthusiasts. Stay tuned for our launch!</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <div class="stat-label">Partner Restaurants</div>
                 </div>
-                <div class="about-image">
-                    🍕
+                <div class="stat-item">
+                    <span class="stat-number">1000+</span>
+                    <div class="stat-label">Active Delivery Agents</div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Get In Touch</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h3>Contact Information</h3>
-                    <p>Have questions, feedback, or want to partner with us? We'd love to hear from you!</p>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">📧</div>
-                        <div>
-                            <strong>Email</strong><br>
-                            hello@wobbleapp.com
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">📞</div>
-                        <div>
-                            <strong>Phone</strong><br>
-                            +1 (555) 123-4567
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">📍</div>
-                        <div>
-                            <strong>Address</strong><br>
-                            123 Food Street, Culinary City, FC 12345
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <span class="stat-number">15min</span>
+                    <div class="stat-label">Average Delivery Time</div>
                 </div>
-                
-                <div class="contact-form">
-                    <form>
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" name="subject" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" required></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">Send Message</button>
-                    </form>
+                <div class="stat-item">
+                    <span class="stat-number">4.9★</span>
+                    <div class="stat-label">Customer Rating</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Floating Action Button -->
-    <div class="fab" onclick="showComingSoon()">
-        🔔
-    </div>
+    <!-- Newsletter Section -->
+    <section class="newsletter" id="signup">
+        <div class="newsletter-content">
+            <h2>Be the First to Know</h2>
+            <p>Wobble is launching soon! Join our exclusive list to get early access, special launch offers, and be among the first to experience the future of food delivery in Zambia.</p>
+            <form class="signup-form" id="signupForm">
+                <input type="email" placeholder="Enter your email" required id="emailInput">
+                <button type="submit">Notify Me</button>
+            </form>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer>
         <div class="footer-content">
-            <div class="footer-links">
-                <a href="#privacy">Privacy Policy</a>
-                <a href="#terms">Terms of Service</a>
-                <a href="#support">Support</a>
-                <a href="#careers">Careers</a>
-                <a href="#press">Press</a>
+            <div class="footer-logo">Wobble</div>
+            <p class="footer-text">Designed with ❤️ by AJI DEV • Based in Zambia</p>
+            <div class="social-links">
+                <a href="#" title="Facebook">📘</a>
+                <a href="#" title="Twitter">🐦</a>
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="LinkedIn">💼</a>
             </div>
-            <p>&copy; 2024 Wobble. All rights reserved. Made with ❤️ for food lovers everywhere.</p>
+            <p class="footer-text">© 2025 Wobble. All rights reserved. • Coming Soon</p>
         </div>
     </footer>
 
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        🎉 Thanks for signing up! We'll notify you when Wobble launches.
+    </div>
+
     <script>
-        // Smooth scrolling for navigation links
+        // Loading Screen
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Scroll Indicator
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('scrollIndicator').style.width = scrollPercent + '%';
+        });
+
+        // Smooth Scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1176,26 +710,35 @@
             });
         });
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 100) {
-                nav.style.background = 'rgba(255, 255, 255, 0.98)';
-                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
-            } else {
-                nav.style.background = 'rgba(255, 255, 255, 0.95)';
-                nav.style.boxShadow = 'none';
+        // Form Submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            
+            if (email) {
+                // Simulate form submission
+                const button = this.querySelector('button');
+                const originalText = button.textContent;
+                button.textContent = 'Signing up...';
+                button.disabled = true;
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    document.getElementById('emailInput').value = '';
+                    
+                    // Show success message
+                    const successMsg = document.getElementById('successMessage');
+                    successMsg.classList.add('show');
+                    
+                    setTimeout(function() {
+                        successMsg.classList.remove('show');
+                    }, 4000);
+                }, 2000);
             }
         });
 
-        // Form submission
-        document.querySelector('.contact-form form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your message! We\'ll get back to you soon.');
-            this.reset();
-        });
-
-        // Feature cards hover animation
+        // Intersection Observer for animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -1204,14 +747,69 @@
         const observer = new IntersectionObserver(function(entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.animationDelay = Math.random() * 0.5 + 's';
-                    entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
                 }
             });
         }, observerOptions);
 
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .stat-item').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // Parallax effect for background elements
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * -0.5;
+            
+            document.querySelectorAll('.bg-element').forEach((element, index) => {
+                element.style.transform = `translateY(${rate * (index + 1) * 0.2}px)`;
+            });
+        });
+
+        // Add interactive hover effects
         document.querySelectorAll('.feature-card').forEach(card => {
-            observer.observe(card);
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Dynamic nav background on scroll
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(255, 255, 255, 0.15)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.1)';
+            }
+        });
+
+        // Add typing effect to hero text
+        const heroTitle = document.querySelector('.hero h1');
+        const originalText = heroTitle.textContent;
+        heroTitle.textContent = '';
+        
+        let i = 0;
+        function typeWriter() {
+            if (i < originalText.length) {
+                heroTitle.textContent += originalText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+        
+        setTimeout(typeWriter, 2000);
+
+        // Add floating animation to CTA buttons
+        document.querySelectorAll('.btn').forEach((btn, index) => {
+            setInterval(() => {
+                btn.style.transform = `translateY(${Math.sin(Date.now() * 0.001 + index) * 2}px)`;
+            }, 16);
         });
     </script>
 </body>
